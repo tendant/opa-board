@@ -1,0 +1,1 @@
+opa eval --data rego.opa --input input.json --data data.json "data.example.allow"
