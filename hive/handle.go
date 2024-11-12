@@ -7,9 +7,10 @@ import (
 	"text/template"
 
 	"github.com/open-policy-agent/opa/rego"
+	"github.com/open-policy-agent/opa/storage/inmem"
 )
 
-func renderIndex(w http.ResponseWriter, r *http.Request) {
+func RenderIndex(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		http.Error(w, "Unable to render template", http.StatusInternalServerError)
@@ -18,7 +19,7 @@ func renderIndex(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
-func evaluatePolicy(w http.ResponseWriter, r *http.Request) {
+func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 	var request struct {
 		Policy string                 `json:"policy"`
 		Data   map[string]interface{} `json:"data"`
@@ -30,13 +31,16 @@ func evaluatePolicy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create an in-memory store for the data
+	store := inmem.NewFromObject(request.Data)
+
 	// Create OPA query
 	ctx := context.Background()
 	query, err := rego.New(
 		rego.Query("data.example.allow"),
 		rego.Module("policy.rego", request.Policy),
 		rego.Input(request.Input),
-		rego.Store(request.Data),
+		rego.Store(store),
 	).PrepareForEval(ctx)
 	if err != nil {
 		http.Error(w, "Unable to prepare policy for evaluation", http.StatusInternalServerError)

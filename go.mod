@@ -2,7 +2,10 @@ module github.com/tendant/opa-hive
 
 go 1.23.2
 
-require github.com/tendant/chi-demo v1.5.2
+require (
+	github.com/open-policy-agent/opa v0.70.0
+	github.com/tendant/chi-demo v1.5.2
+)
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
@@ -20,16 +23,14 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.4.0 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/lmittmann/tint v1.0.4 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mikejav/gosts v0.0.0-20170827185855-76a026df1bc8 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/open-policy-agent/opa v0.70.0 // indirect
 	github.com/prometheus/client_golang v1.20.5 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.55.0 // indirect
