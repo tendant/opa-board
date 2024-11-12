@@ -36,10 +36,15 @@ func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 
 	// Parse `data` and `input` into objects
 	var data, input map[string]interface{}
-	if err := json.Unmarshal([]byte(request.Data), &data); err != nil {
+	dataStr := request.Data
+	if dataStr == "" {
+		dataStr = "{}"
+	}
+	if err := json.Unmarshal([]byte(dataStr), &data); err != nil {
 		http.Error(w, "Invalid JSON in 'data': "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	if err := json.Unmarshal([]byte(request.Input), &input); err != nil {
 		http.Error(w, "Invalid JSON in 'input': "+err.Error(), http.StatusBadRequest)
 		return
@@ -55,7 +60,7 @@ func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 	query, err := rego.New(
 		rego.Query("data.example.allow"),
 		rego.Module("policy.rego", request.Policy),
-		rego.Input(request.Input),
+		rego.Input(input),
 		rego.Store(store),
 	).PrepareForEval(ctx)
 	if err != nil {
