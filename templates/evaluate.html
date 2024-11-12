@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OPA Dynamic Evaluation</title>
     <script src="https://unpkg.com/htmx.org"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+
 </head>
 <body>
     <h1>OPA Rule Evaluation</h1>
-    <form hx-post="/evaluate" hx-target="#result" hx-swap="innerHTML">
+    <form hx-post="/evaluate" hx-target="#result" hx-swap="innerHTML" hx-ext="json-enc">
         <label for="policy">Policy:</label><br>
         <textarea id="policy" name="policy" rows="10" cols="50" required>
 package example
@@ -34,6 +36,7 @@ allow {
         <br><br>
 
         <button type="submit">Evaluate</button>
+
     </form>
     <div id="result">
       <!-- Results will be dynamically updated here -->
