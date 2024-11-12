@@ -24,19 +24,31 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 
 func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 	var request struct {
-		Policy string                 `json:"policy"`
-		Data   map[string]interface{} `json:"data"`
-		Input  map[string]interface{} `json:"input"`
+		Policy string `json:"policy"`
+		Data   string `json:"data"`
+		Input  string `json:"input"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		slog.Error("Failed decoding request body", "err", err)
-		http.Error(w, "Invalid JSON input", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON input: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	// Parse `data` and `input` into objects
+	var data, input map[string]interface{}
+	if err := json.Unmarshal([]byte(request.Data), &data); err != nil {
+		http.Error(w, "Invalid JSON in 'data': "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	if err := json.Unmarshal([]byte(request.Input), &input); err != nil {
+		http.Error(w, "Invalid JSON in 'input': "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	slog.Info("inputs", "policy", request.Policy, "data", data, "input", input)
+
 	// Create an in-memory store for the data
-	store := inmem.NewFromObject(request.Data)
+	store := inmem.NewFromObject(data)
 
 	// Create OPA query
 	ctx := context.Background()
@@ -47,6 +59,7 @@ func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 		rego.Store(store),
 	).PrepareForEval(ctx)
 	if err != nil {
+		slog.Error("Failed evaluating opa policy", "err", err)
 		http.Error(w, "Unable to prepare policy for evaluation", http.StatusInternalServerError)
 		return
 	}
@@ -59,11 +72,13 @@ func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render result dynamically
-	tmpl, err := template.ParseFiles("../templates/result.html")
+	tmpl, err := template.ParseFiles("../../templates/result.html")
 	if err != nil {
 		http.Error(w, "Unable to render template", http.StatusInternalServerError)
 		return
 	}
+
+	slog.Info("result", "results", results)
 
 	response := map[string]interface{}{
 		"result": results[0].Expressions[0].Value,
