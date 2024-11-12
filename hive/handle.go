@@ -6,13 +6,16 @@ import (
 	"net/http"
 	"text/template"
 
+	"log/slog"
+
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/storage/inmem"
 )
 
 func RenderIndex(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/index.html")
+	tmpl, err := template.ParseFiles("../../templates/evaluate.html")
 	if err != nil {
+		slog.Error("Failed rendering template", "err", err)
 		http.Error(w, "Unable to render template", http.StatusInternalServerError)
 		return
 	}
@@ -27,6 +30,7 @@ func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		slog.Error("Failed decoding request body", "err", err)
 		http.Error(w, "Invalid JSON input", http.StatusBadRequest)
 		return
 	}
@@ -55,7 +59,7 @@ func EvaluatePolicy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render result dynamically
-	tmpl, err := template.ParseFiles("templates/result.html")
+	tmpl, err := template.ParseFiles("../templates/result.html")
 	if err != nil {
 		http.Error(w, "Unable to render template", http.StatusInternalServerError)
 		return
