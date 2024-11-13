@@ -1,4 +1,4 @@
-module github.com/tendant/opa-hive
+module github.com/tendant/opa-board
 
 go 1.23.2
 

@@ -1,10 +1,10 @@
-package hive
+package board
 
 import (
 	"context"
 	"encoding/json"
+	"html/template"
 	"net/http"
-	"text/template"
 
 	"log/slog"
 
